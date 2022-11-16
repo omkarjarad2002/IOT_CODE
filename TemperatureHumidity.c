@@ -1,37 +1,61 @@
-// Servo Motor
+// servo motor
+
 #include <Servo.h>
-int V_distance = 0;
-Servo servo_6;
-long readUltrasonicDistance(int triggerPin, int echoPin)
-{
-    pinMode(triggerPin, OUTPUT); // Clear the trigger
-    digitalWrite(triggerPin, LOW);
-    delayMicroseconds(2);
-    // Sets the trigger pin to HIGH state for 10 microseconds
-    digitalWrite(triggerPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(triggerPin, LOW);
-    pinMode(echoPin, INPUT);
-    // Reads the echo pin, and returns the sound wave travel time in microseconds
-    return pulseIn(echoPin, HIGH);
-}
+
+#define trigPin 9
+
+#define echoPin 8
+
+Servo servo;
+
+int sound = 250;
+
 void setup()
 {
-    servo_6.attach(6, 500, 2500);
-}
-void loop()
-{
-    servo_6.write(90);
-    V_distance = 0.01723 * readUltrasonicDistance(7, 7);
-    if (V_distance <= 100)
-    {
-        servo_6.write(180);
-        delay(3000); // Wait for 3000 millisecond(s)
-        servo_6.write(90);
-    }
-    servo_6.write(90);
+
+    Serial.begin(9600);
+
+    pinMode(trigPin, OUTPUT);
+
+    pinMode(echoPin, INPUT);
+
+    servo.attach(6);
 }
 
+void loop()
+{
+
+    long duration, distance;
+
+    digitalWrite(trigPin, LOW);
+
+    delayMicroseconds(2);
+
+    digitalWrite(trigPin, HIGH);
+
+    delayMicroseconds(10);
+
+    digitalWrite(trigPin, LOW);
+
+    duration = pulseIn(echoPin, HIGH);
+
+    distance = (duration / 2) / 29.1;
+    if (distance < 40)
+    {
+        Serial.print(distance);
+        Serial.println(" cm");
+        servo.write(90);
+    }
+
+    else
+    {
+
+        Serial.println("The distance is more than 180cm");
+    }
+
+    delay(500);
+    servo.write(-90);
+}
 // Temperature Humidity
 #include <DHT.h>
 #include <ESP8266WiFi.h>
